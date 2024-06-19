@@ -1,33 +1,35 @@
-import { Component, ElementRef, OnInit, Renderer2, ViewEncapsulation } from '@angular/core';
-import { CodigoCapchaService } from './servcios/codigo-capcha.service';
-import { Router } from '@angular/router';
-import { CodigoCapcha } from './modelos/codigo-capcha';
+import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { DatosVerificar } from './modelos/datos-verificar';
-import { DatosPersonales } from './modelos/datos-personales';
-import { TipoSolicitudService } from './servcios/tipo-solicitud.service';
+import { Router } from '@angular/router';
+import { CodigoCapcha } from 'src/app/modelos/codigo-capcha';
+import { DatosPersonales } from 'src/app/modelos/datos-personales';
+import { DatosVerificar } from 'src/app/modelos/datos-verificar';
+import { Pdf } from 'src/app/modelos/pdf';
+import { CodigoCapchaService } from 'src/app/servcios/codigo-capcha.service';
+import { TipoSolicitudService } from 'src/app/servcios/tipo-solicitud.service';
 
 @Component({
-  selector: 'app-root',
-  templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss'],
-  //  encapsulation: ViewEncapsulation.None
+  selector: 'app-autentificar',
+  templateUrl: './autentificar.component.html',
+  styleUrls: ['./autentificar.component.scss']
 })
-export class AppComponent implements OnInit {
+export class AutentificarComponent implements OnInit {
 
   dtOptions: DataTables.Settings = {};
+  pdf :Pdf ;
 
-  datosPersonales:DatosPersonales[]; // trae los datos de la persona con su imagen incluida
+ 
 title = "pasantia" ;
-// formulario del capcha
+
 mensaje_error = "";
 codigoCapcha: CodigoCapcha[];
  datosverificar: DatosVerificar[] = [];
-   reurnvalor:String ="";
+  reurnvalor:String ="";
 nuevo = [];
  lista: String[] = [];
+
 public verificar:DatosVerificar = new DatosVerificar();
- 
+ // formulario del capcha
   formulariologin = new FormGroup ({
     cedula: new FormControl('', Validators.required),
     fecha_de_expedicion: new FormControl('', Validators.required),
@@ -36,7 +38,7 @@ public verificar:DatosVerificar = new DatosVerificar();
   });
 
   imgcapcha = "";
-  constructor( private codigoCapchaService:CodigoCapchaService,private route:Router, private renderer: Renderer2, private el: ElementRef, private tipoSolicitudService:TipoSolicitudService){
+  constructor( private codigoCapchaService:CodigoCapchaService,private route:Router, private tipoSolicitudService:TipoSolicitudService){
   }
 
   verificar_login(){
@@ -55,9 +57,7 @@ cargarr(comparar:String){
    let valor = "true";
    if(comparar === valor){
   
-  this.tipoSolicitudService.traer_datos_personales().subscribe(dato => {
-    this.datosPersonales = dato; 
-  });
+
  
     this.route.navigate(['Solicitudes'])
    }
@@ -81,7 +81,7 @@ cargarr(comparar:String){
 
 
 verificar_login_ultimo(){
-  alert("hola");
+
   let data = this.formulariologin.value;
   var valor:String ;
   this.lista = [];
@@ -89,15 +89,19 @@ verificar_login_ultimo(){
   this.lista.push(String(data.cedula));
   this.lista.push(String(data.fecha_de_expedicion));
   this.codigoCapchaService.sendDataToSpring(this.lista).subscribe(response => {
-      valor= Object.values(response)[0].existe_REGISTRO
+     valor= Object.values(response)[0].existe_REGISTRO
 
-      this.cargarr(valor);
+    this.cargarr(valor);  // este lo documente porque es de manera local
+   
+
       } );
+
 }
 
 
 ngOnInit(): void {
-
+ 
+  
   this.verificar_login();
 }
 
